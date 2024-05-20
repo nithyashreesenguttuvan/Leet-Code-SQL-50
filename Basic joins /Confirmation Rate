@@ -1,0 +1,9 @@
+with UserConfirmations as (
+    select s.user_id,count(c.user_id) as total_requests,
+        sum(case when c.action = 'confirmed' then 1 else 0 end) as confirmed_requests
+    from Signups s
+    left join Confirmations c on s.user_id = c.user_id
+    group by s.user_id )
+select user_id,round(case when total_requests = 0 then 0 else confirmed_requests * 1.0 / total_requests END, 2) as confirmation_rate
+from UserConfirmations
+order by user_id;
