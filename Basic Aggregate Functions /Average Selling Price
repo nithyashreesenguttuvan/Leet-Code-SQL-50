@@ -1,0 +1,21 @@
+with SalesWithPrice as (
+    select p.product_id,coalesce(u.units, 0) as units,p.price
+    from Prices p left join UnitsSold u on p.product_id = u.product_id
+    and u.purchase_date between p.start_date and p.end_date
+)
+, Revenue as (
+    select product_id,sum(units * price) as total_revenue,sum(units) as total_units_sold
+    from SalesWithPrice
+    group by product_id
+)
+, AllProducts as (
+    select distinct product_id from Prices
+)
+select a.product_id,
+    case
+        when r.total_units_sold = 0 then 0
+        else round(r.total_revenue / r.total_units_sold, 2)
+    END as average_price
+from AllProducts a
+left join Revenue r on a.product_id = r.product_id
+order by a.product_id;
