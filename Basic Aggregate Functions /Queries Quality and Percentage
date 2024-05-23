@@ -1,1 +1,17 @@
+with Ratios as (
+    select query_name,rating * 1.0 / position as ratio from Queries
+),
+Quality as (
+    select query_name,round(avg(ratio), 2) as quality from Ratios
+    group by query_name
+),
+PoorQueries as (
+    select query_name,count(*) as total_queries,sum(case when rating < 3 then 1 else 0 end) as poor_queries from Queries
+    group by query_name
+),
+PoorQueryPercentage as (
+    select query_name,round((poor_queries * 100.0 / total_queries), 2) as poor_query_percentage from PoorQueries
+)
+select q.query_name,q.quality,pqp.poor_query_percentage from Quality q
+join PoorQueryPercentage pqp on q.query_name = pqp.query_name;
 
