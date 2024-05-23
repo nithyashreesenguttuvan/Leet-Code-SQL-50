@@ -1,0 +1,12 @@
+with FirstLogin as (
+    select player_id,min(event_date) as first_login_date from Activity
+    group by player_id
+),
+NextDayLogin as (
+    select a.player_id,a.event_date from Activity a
+    join FirstLogin fl on a.player_id = fl.player_id
+    where a.event_date = date_add(fl.first_login_date, interval 1 day)
+)
+select round(count(distinct n.player_id) / count(distinct f.player_id), 2) as fraction
+from FirstLogin f
+left join NextDayLogin n on f.player_id = n.player_id;
