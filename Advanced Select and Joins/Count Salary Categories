@@ -1,0 +1,18 @@
+# Write your MySQL query statement below
+with SalaryCategories as (
+    select 'Low Salary' as category
+    union all
+    select 'Average Salary'
+    union all
+    select 'High Salary'
+)
+
+select SC.category,
+    count(case 
+            when SC.category = 'Low Salary' and A.income < 20000 then 1
+            when SC.category = 'Average Salary' and A.income between 20000 and 50000 then 1
+            when SC.category = 'High Salary' and A.income > 50000 then 1
+        end) as accounts_count
+from SalaryCategories SC
+left join Accounts A on 1=1
+group by SC.category;
